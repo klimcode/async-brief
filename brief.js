@@ -32,16 +32,16 @@ module.exports = function go(flow) {
           nextStepArgIndex = nextStep.args.findIndex(arg => arg === func);
           if (nextStepArgIndex !== -1) return true;
         });
-        
+        const arg = step.prevStepResults.length >= 2 ? 
+          step.prevStepResults : 
+          step.prevStepResults[0];
+
+
         if ((nextStepIndex !== -1) || (nextStepArgIndex !== -1)) {
-          const arg = step.prevStepResults.length >= 2 ? 
-            step.prevStepResults : 
-            step.prevStepResults[0];
           steps[nextStepIndex].args[nextStepArgIndex] = new Promise(func.bind(null, arg));
         }
-
         if (lastStep) {
-          func(step.prevStepResults);
+          func(arg);
         }
       });
 
