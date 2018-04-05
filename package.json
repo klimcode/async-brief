@@ -1,0 +1,29 @@
+{
+  "name": "async-brief",
+  "version": "0.1.0",
+  "description": "The most brief syntax for describing async flow",
+  "main": "brief.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klimcode/async-brief.git"
+  },
+  "keywords": [
+    "function",
+    "no-dependencies",
+    "async",
+    "code-management"
+  ],
+  "author": "John Klimov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/klimcode/async-brief/issues"
+  },
+  "homepage": "https://github.com/klimcode/async-brief#readme",
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.10.0"
+  }
+}
