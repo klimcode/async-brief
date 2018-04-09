@@ -1,4 +1,4 @@
-module.exports = function go(input, errorCallback, milestonesCb) {
+module.exports = function go(input, errorCallback, isMilestones) {
   const isFunction = test => typeof test === 'function';
   const isArray = test => test instanceof Array;
   const lastOf = array => array[array.length - 1];
@@ -20,8 +20,16 @@ module.exports = function go(input, errorCallback, milestonesCb) {
 
 
   return new Promise((resolve, reject) => {
-    const errCb = errorCallback || reject;
     const STEPS = convert(input);
+    const resCb = (res) => {
+      let result = res;
+      if (isMilestones) {
+        result = STEPS.map(st => st.prevStepResults);
+        result.push(res);
+      }
+      resolve(result);
+    };
+    const errCb = errorCallback || reject;
 
 
     (function run(stepIndex) { // recursive function mutates STEPS array
@@ -48,8 +56,7 @@ module.exports = function go(input, errorCallback, milestonesCb) {
             STEPS[nextStepIndex].args[nextStepArgIndex] = new Promise(func.bind(null, arg));
           }
           if (lastStep) {
-            if (milestonesCb) milestonesCb(STEPS.map(st => st.prevStepResults));
-            func(arg, resolve, errCb);
+            func(arg, resCb, errCb);
           }
         });
 
@@ -65,7 +72,3 @@ module.exports = function go(input, errorCallback, milestonesCb) {
     }(0));
   });
 };
-
-// function bar(x, res, rej) { setTimeout(() => rej(x + 3), 100); }
-// function errcb(err) { console.log('cb catched', err); }
-// module.exports([['foo'], bar]).catch((err) => { console.log('catch catched', err); });

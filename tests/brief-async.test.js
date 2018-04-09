@@ -4,13 +4,11 @@
 /* eslint no-multi-spaces: "off" */
 const go = require('../brief-async');
 
-let milestones;
 let prom;
 
-function bar(x, res, rej) { setTimeout(() => res(x + 3), 100); }
-function baz(x, res, rej) { setTimeout(() => res(x + 10), 200); }
+function bar(x, res, rej) { setTimeout(() => res(x + 1), 10); }
+function baz(x, res, rej) { setTimeout(() => res(x + 2), 20); }
 function errcb(err) { throw new Error(`errcb catched ${err}`); }
-function mcb(m) { milestones = m; }
 
 
 beforeEach(() => {
@@ -18,20 +16,22 @@ beforeEach(() => {
     ['foo'],  bar,
     [bar],    baz,
   ];
-  prom = go(flow, errcb, mcb);
+  prom = go(flow, errcb, true);
 });
 
-describe('brief-async', () => {
+describe('basic', () => {
   test('should return a promise', () => {
     expect(prom).toBeInstanceOf(Promise);
   });
-  test('milestone is foo3', async () => {
+});
+describe('result with milestones', () => {
+  test('second milestone is foo1', async () => {
     const res = await prom;
-    expect(milestones[1][0]).toBe('foo3');
+    expect(res[1][0]).toBe('foo1');
   });
-  test('result is foo310', async () => {
+  test('final result is foo12', async () => {
     const res = await prom
       .catch((err) => { throw new Error(`catch block catched ${err}`); });
-    expect(res).toBe('foo310');
+    expect(res[res.length - 1]).toBe('foo12');
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "brief-async",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The most brief syntax for describing async flow",
   "main": "brief-async.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.10.0",
-    "eslint-plugin-jest": "^5.8.0",
+    "eslint-plugin-jest": "^21.15.0",
     "jest": "^22.4.3"
   }
 }
