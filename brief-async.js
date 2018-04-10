@@ -29,7 +29,12 @@ module.exports = function go(input, errorCallback, isMilestones) {
       }
       resolve(result);
     };
-    const errCb = errorCallback || reject;
+    const errCb = errorCallback
+      ? (err) => {
+        errorCallback(err);
+        resolve(err);
+      }
+      : reject;
 
 
     (function run(stepIndex) { // recursive function mutates STEPS array

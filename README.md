@@ -16,7 +16,7 @@ npm i -S brief-async
 
 ```js
 // fn1-fn4 and finish functions are declared somethere above.
-const flow = require('brief-async')
+const flow = require('brief-async');
 const steps = [
   ['foo'],      fn1, fn2, fn3,
   [fn1, fn2],   fn4,
@@ -34,8 +34,24 @@ The `steps` is just an array. It contains functions and their dependencies.
 3. The third element may be a function or an array.
 
 ```js
-const result = flow(steps, errHandler, getMilestones);
+const steps = [
+  // 'foo' is the one argument for fn1-fn3 which work parallel
+  ['foo'],      fn1, fn2, fn3,
+  // f1 and fn2 after resolving pack their results to an array which is the first argument for fn4
+  [fn1, fn2],   fn4,
+  // results of f3 and fn4 become go to finish as an array
+  [fn3, fn4],   finish,
+];
 // result is a Promise
 // errHandler is a callback to execute when a reject function is called
-// getMilestones is a callback where the single argument is an array of intermediate results
+// if isMilestones == true, intermediate results will be included to the final result
+const result = flow(steps, errHandler, isMilestones);
 ```
+
+Step handlers or **executors** are functions with 3 arguments:
+
+1. Data from the previous step (array or a single value).
+2. Resolve callback.
+3. Reject callback.
+
+2-nd and 3-rd arguments is needed to finish a Promise. An executor function must call one of those callbacks instead of using `return` statement. The first argument is polymorphic: a value or an array; it depends on the count of dependencies.
