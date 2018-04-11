@@ -4,6 +4,8 @@ The shortest syntax for defining async flow. It helps to handle difficult cases 
 
 ## Installation
 
+> **This lib is experimental. Its API may change soon**
+
 ```bash
 npm i -S brief-async
 ```
@@ -29,18 +31,18 @@ const result = await flow(steps);
 
 The `steps` is just an array. It contains functions and their dependencies.
 
-1. The element is an array of dependencies which will be resolved and then taken by the second element.
+1. The first element is an array of dependencies which will be resolved and then taken by the second element.
 2. The second element must be a function or it will be ignored instead.
 3. The third element may be a function or an array.
 
 ```js
 const steps = [
   // 'foo' is the one argument for fn1-fn3 which work parallel
-  ['foo'],      fn1, fn2, fn3,
+  ['foo', 123],       fn1, fn2, fn3, deadEnd,
   // f1 and fn2 after resolving pack their results to an array which is the first argument for fn4
-  [fn1, fn2],   fn4,
+  [fn1, fn2, fnArg],  fn4,
   // results of f3 and fn4 become go to finish as an array
-  [fn3, fn4],   finish,
+  [fn3, fn4],         finish,
 ];
 // result is a Promise
 // errHandler is a callback to execute when a reject function is called
@@ -55,3 +57,7 @@ Step handlers or **executors** are functions with 3 arguments:
 3. Reject callback.
 
 2-nd and 3-rd arguments is needed to finish a Promise. An executor function must call one of those callbacks instead of using `return` statement. The first argument is polymorphic: a value or an array; it depends on the count of dependencies.
+
+**Important**: function `deadEnd` does not have `resolve` function as an argument.
+But it has a `reject` function.
+So, "dead end" functions may break the whole chain, but they can not resolve the chain.

@@ -29,12 +29,10 @@ module.exports = function go(input, errorCallback, isMilestones) {
       }
       resolve(result);
     };
-    const errCb = errorCallback
-      ? (err) => {
-        errorCallback(err);
-        resolve(err);
-      }
-      : reject;
+    const errCb = (err) => {
+      if (errorCallback) errorCallback(err);
+      reject(err);
+    };
 
 
     (function run(stepIndex) { // recursive function mutates STEPS array
@@ -48,7 +46,7 @@ module.exports = function go(input, errorCallback, isMilestones) {
           if (!isFunction(func)) return; // executor is not a function -> ignoring
 
           let nextStepArgIndex;
-          const nextStepIndex = STEPS.findIndex((nextStep) => {
+          const argIndex = STEPS.findIndex((nextStep) => {
             nextStepArgIndex = nextStep.args.findIndex(arg => arg === func); // closure mutation
             return (nextStepArgIndex !== -1);
           });
@@ -56,13 +54,11 @@ module.exports = function go(input, errorCallback, isMilestones) {
             step.prevStepResults :
             step.prevStepResults[0];
 
-
-          if ((nextStepIndex !== -1) || (nextStepArgIndex !== -1)) { // the next executor is found
-            STEPS[nextStepIndex].args[nextStepArgIndex] = new Promise(func.bind(null, arg));
-          }
-          if (lastStep) {
-            func(arg, resCb, errCb);
-          }
+          if ((argIndex !== -1) || (nextStepArgIndex !== -1)) { // func is a dependency of smth.
+            STEPS[argIndex].args[nextStepArgIndex] = new Promise(func.bind(null, arg));
+          } else if (lastStep) {
+            func(arg, resCb, errCb); // final
+          } else func(arg, null, errCb); // dead end. No access to the final resolve callback
         });
 
         run(stepIndex + 1);
