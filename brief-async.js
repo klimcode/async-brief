@@ -50,15 +50,13 @@ module.exports = function go(input, errorCallback, isMilestones) {
             nextStepArgIndex = nextStep.args.findIndex(arg => arg === func); // closure mutation
             return (nextStepArgIndex !== -1);
           });
-          const arg = step.prevStepResults.length >= 2 ?
-            step.prevStepResults :
-            step.prevStepResults[0];
+          const prevResults = step.prevStepResults;
 
           if ((argIndex !== -1) || (nextStepArgIndex !== -1)) { // func is a dependency of smth.
-            STEPS[argIndex].args[nextStepArgIndex] = new Promise(func.bind(null, arg));
+            STEPS[argIndex].args[nextStepArgIndex] = new Promise(func.bind(null, prevResults));
           } else if (lastStep) {
-            func(arg, resCb, errCb); // final
-          } else func(arg, null, errCb); // dead end. No access to the final resolve callback
+            func(prevResults, resCb, errCb); // final
+          } else func(prevResults, null, errCb); // dead end. No access to the final resolve cb
         });
 
         run(stepIndex + 1);

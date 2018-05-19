@@ -52,7 +52,7 @@ const result = flow(steps, errHandler, isMilestones);
 
 Step handlers or **executors** are functions with 3 arguments:
 
-1. Data from the previous step (array or a single value).
+1. Data from the previous step (array).
 2. Resolve callback.
 3. Reject callback.
 
